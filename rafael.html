@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rafael Website</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0d0f12;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Canvas untuk latar belakang interaktif partikel */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: rgba(25, 30, 38, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 24px;
+            padding: 35px;
+            max-width: 520px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Header Judul */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 85px;
+            height: 85px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4a5568, #2d3748);
+            margin: 0 auto 12px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #ffffff, #a0aec0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Navigasi Menu Halaman */
+        .nav-menu {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 25px;
+            background: rgba(10, 14, 20, 0.6);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 10px 5px;
+            background: transparent;
+            border: none;
+            color: #a0aec0;
+            font-weight: 600;
+            font-size: 0.85rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #4a5568, #2b374e);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .nav-btn:hover:not(.active) {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Konten Halaman */
+        .page-content {
+            display: none;
+            background: rgba(15, 20, 28, 0.5);
+            padding: 22px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            min-height: 250px;
+        }
+
+        .page-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-content h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #e2e8f0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* Tabel Halaman 1 */
+        .bio-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bio-table td {
+            padding: 10px 0;
+            font-size: 0.95rem;
+            color: #e2e8f0;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+        }
+
+        .bio-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .bio-table td.label {
+            width: 42%;
+            font-weight: 600;
+            color: #a0aec0;
+        }
+
+        /* Halaman 2 & 3 */
+        .idol-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        }
+
+        .text-desc {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #cbd5e0;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 11px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-roblox {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-roblox:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.5);
+        }
+
+        .btn-spotify {
+            background: linear-gradient(135deg, #1db954, #1aa34a);
+            box-shadow: 0 4px 12px rgba(29, 185, 84, 0.3);
+        }
+
+        .btn-spotify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(29, 185, 84, 0.5);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.78rem;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas Background Interaktif -->
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="card">
+        <!-- Header -->
+        <div class="header">
+            <div class="avatar">⚽</div>
+            <h1>Rafael Website</h1>
+        </div>
+
+        <!-- Menu Navigasi 3 Halaman -->
+        <div class="nav-menu">
+            <button class="nav-btn active" onclick="openPage(1)">Halaman 1</button>
+            <button class="nav-btn" onclick="openPage(2)">Halaman 2</button>
+            <button class="nav-btn" onclick="openPage(3)">Halaman 3</button>
+        </div>
+
+        <!-- HALAMAN 1: TENTANG SAYA -->
+        <div id="page1" class="page-content active">
+            <h2>Tentang Saya 👤</h2>
+            <table class="bio-table">
+                <tr>
+                    <td class="label">Nama Lengkap</td>
+                    <td>: Rafael Abbiyu Gavrilla Soekarno</td>
+                </tr>
+                <tr>
+                    <td class="label">Tanggal Lahir</td>
+                    <td>: 23 Februari 2012</td>
+                </tr>
+                <tr>
+                    <td class="label">Tempat Sekolah</td>
+                    <td>: SMP Tawakkal</td>
+                </tr>
+                <tr>
+                    <td class="label">Kelas</td>
+                    <td>: 9.1</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- HALAMAN 2: CITA-CITA & IDOLA -->
+        <div id="page2" class="page-content">
+            <h2>Cita-Cita & Idola ⚽</h2>
+            <img class="idol-img" src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=600&q=80" alt="Sepak Bola">
+            <p class="text-desc">
+                Saya bercita-cita ingin menjadi seorang <strong>Atlet Sepak Bola</strong> profesional. Pemain idola yang menjadi inspirasi saya adalah <strong>Marcus Rashford</strong>.
+            </p>
+        </div>
+
+        <!-- HALAMAN 3: HOBI & MUSIK -->
+        <div id="page3" class="page-content">
+            <h2>Hobi & Musik 🎧</h2>
+            <p class="text-desc">
+                Di waktu senggang, saya sangat suka bermain game <strong>Roblox</strong>. Selain itu, saya juga suka mendengarkan lagu-lagu dari band <strong>Avenged Sevenfold</strong> di <strong>Spotify</strong>.
+            </p>
+            <div class="btn-container">
+                <a href="https://www.roblox.com" target="_blank" class="btn btn-roblox">Roblox</a>
+                <a href="https://open.spotify.com" target="_blank" class="btn btn-spotify">Spotify</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            &copy; 2026 Rafael Website. Dibuat dengan Notepad.
+        </div>
+    </div>
+
+    <!-- Script Pemindah Halaman & Animasi Interaktif -->
+    <script>
+        function openPage(pageNum) {
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.classList.remove('active'));
+
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById('page' + pageNum).classList.add('active');
+            buttons[pageNum - 1].classList.add('active');
+        }
+
+        /* --- BACKGROUND INTERAKTIF CANVAS --- */
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let particlesArray = [];
+        const numberOfParticles = 75;
+
+        // Posisi kursor mouse
+        const mouse = {
+            x: null,
+            y: null,
+            radius: 120
+        };
+
+        window.addEventListener('mousemove', function(event) {
+            mouse.x = event.x;
+            mouse.y = event.y;
+        });
+
+        window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            init();
+        });
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 1.2;
+                this.speedY = (Math.random() - 0.5) * 1.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+
+                // Interaksi dengan Mouse
+                let dx = mouse.x - this.x;
+                let dy = mouse.y - this.y;
+                let distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance < mouse.radius) {
+                    this.x -= dx / 10;
+                    this.y -= dy / 10;
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = 'rgba(160, 174, 192, 0.7)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        function connect() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let dx = particlesArray[a].x - particlesArray[b].x;
+                    let dy = particlesArray[a].y - particlesArray[b].y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 110) {
+                        let opacity = 1 - (distance / 110);
+                        ctx.strokeStyle = 'rgba(120, 144, 156, ' + opacity * 0.25 + ')';
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connect();
+            requestAnimationFrame(animate);
+        }
+
+        init();
+        animate();
+    </script>
+
+</body>
+</html>
